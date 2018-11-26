@@ -48,6 +48,7 @@ def get_item_data(id: int) -> Dict[str, object]:
     return response.json()[0]
 
 def filter_item_data(data: Dict[str, object]) -> Dict[str, object]:
+    filter_keys(data['item_type'], ['id', 'name'])
     for pattern in data['pattern']:
         for item in pattern['item_pattern']:
             filter_keys(item, ['item_id', 'quantity'])
@@ -57,7 +58,11 @@ def filter_item_data(data: Dict[str, object]) -> Dict[str, object]:
     return data 
 
 def get_item_definitions(ids: List[int]) -> List[Dict[str, object]]:
-    return list(map(filter_item_data, map(get_item_data, ids)))
+    items = list(map(filter_item_data, map(get_item_data, ids)))
+    items = [item for item in items if item['active'] == '1']
+    for item in items:
+        del item['active']
+    return items
 
 #----------------------------- Step 3: Item images -----------------------------
 def get_item_image(item: Dict[str, object]):
