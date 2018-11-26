@@ -1,23 +1,25 @@
 var path = require('path')
 var webpack = require('webpack')
 var HtmlPlugin = require('html-webpack-plugin');
+var CopyPlugin = require('copy-webpack-plugin');
+var MiniCssPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
 	mode: 'development',
-	entry: './src/index.ts',
+	entry: {
+		style: './assets/main.scss',
+		index: './src/index.ts'
+	},
 	module: {
 		rules: [{
 				test: /\.vue$/,
 				loader: 'vue-loader',
 				options: {
+					esModule: true,
 					loaders: {
-						// Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-						// the "scss" and "sass" values for the lang attribute to the right configs here.
-						// other preprocessors should work out of the box, no loader config like this necessary.
 						'scss': 'vue-style-loader!css-loader!sass-loader',
 						'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
 					}
-					// other vue-loader options go here
 				}
 			},
 			{
@@ -34,7 +36,21 @@ module.exports = {
 				options: {
 					name: '[name].[ext]?[hash]'
 				}
+			},
+			{
+				test: /\.scss$/,
+				use: [{
+						loader: MiniCssPlugin.loader
+					},
+					{
+						loader: 'css-loader'
+					},
+					{
+						loader: 'sass-loader'
+					}
+				]
 			}
+
 		]
 	},
 	resolve: {
@@ -68,12 +84,18 @@ module.exports = {
 		ignored: /node_modules/
 	},
 	plugins: [
+		new MiniCssPlugin(),
 		new HtmlPlugin({
 			inject: false,
 			filename: 'index.html',
 			template: 'src/index.html',
 			chunksSortMode: 'dependency'
-		})
+		}),
+		new CopyPlugin([{
+			from: 'static',
+			to: './',
+			test: /.*\.(png|jpg|jpeg|gif|svg|json)$/
+		}]),
 	]
 }
 
