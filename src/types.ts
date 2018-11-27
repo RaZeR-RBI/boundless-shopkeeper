@@ -1,39 +1,42 @@
 /* Item and recipe data */
 export class Item
 {
+	public label: string;
   constructor(
-		id: number,
-		name: string,
-		slug: string,
-		item_type: ItemType,
-		pattern: Pattern[]
-	) {}
+		public id: number,
+		public name: string,
+		public slug: string,
+		public item_type: ItemType,
+		public pattern: Pattern[]
+	) {
+		this.label = name;
+	}
 }
 
 export class ItemType
 {
 	constructor(
-		id: number,
-		name: string
+		public id: number,
+		public name: string
 	) {}
 }
 
 export class Pattern
 {
 	constructor(
-		quantity: number,
-		duration: number,
-		spark: number,
-		wear: number,
-		power: number,
-		item_pattern: PatternItem[]
+		public quantity: number,
+		public duration: number,
+		public spark: number,
+		public wear: number,
+		public power: number,
+		public item_pattern: PatternItem[]
 	) {}
 }
 
 export class PatternItem
 {
 	constructor(
-		item_id: number,
-		quantity: number,
+		public item_id: number,
+		public quantity: number,
 	) {}
 }

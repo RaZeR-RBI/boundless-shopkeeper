@@ -13,3 +13,7 @@ body {
 .navbar-item img {
     max-height: unset;
 }
+
+.navbar.is-dark {
+    border-bottom: 3px solid #242632;
+}
