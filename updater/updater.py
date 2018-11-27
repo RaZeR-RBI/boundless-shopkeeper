@@ -24,6 +24,20 @@ def filter_keys(d: Dict, keysToLeave: List):
     for unwanted_key in unwanted:
         del d[unwanted_key]
 
+def convert_to_numbers(d: Dict, keys: List):
+    for key in d:
+        value = d[key]
+        if isinstance(value, dict):
+            convert_to_numbers(value, keys)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    convert_to_numbers(item, keys)
+        else:
+            if key not in keys:
+                continue
+            d[key] = int(float(value))
+
 #----------------------------- Step 1: Item list -------------------------------
 def parse_item(json_str: str) -> Tuple[int, str]:
     parseable = json_str.replace("'item'", '"item"').replace("'id'", '"id"')
@@ -55,6 +69,8 @@ def filter_item_data(data: Dict[str, object]) -> Dict[str, object]:
         filter_keys(pattern, 
             ['quantity', 'duration', 'spark', 'wear', 'power', 'item_pattern'])
     filter_keys(data, ['id', 'slug', 'name', 'active', 'item_type', 'pattern'])
+    convert_to_numbers(data, 
+        ["id", "quantity", "duration", "spark", "wear", "power", "item_id"])
     return data 
 
 def get_item_definitions(ids: List[int]) -> List[Dict[str, object]]:

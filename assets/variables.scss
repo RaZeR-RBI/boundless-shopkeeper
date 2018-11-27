@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Francois+One|Merriweather+Sans');
+h1, h2, h3, h4, h5, h6, label {
+    font-family: 'Francois One'
+}
+
+$light: #CACDD4;
+$dark: #424453;
+$family-sans-serif: 'Merriweather Sans';
+$body-background-color: $light;
+
+@import '../node_modules/bulma/sass/utilities/_all.sass';

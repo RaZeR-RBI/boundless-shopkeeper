@@ -1,5 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
+var VuePlugin = require('vue-loader/lib/plugin');
 var HtmlPlugin = require('html-webpack-plugin');
 var CopyPlugin = require('copy-webpack-plugin');
 var MiniCssPlugin = require('mini-css-extract-plugin');
@@ -85,6 +86,7 @@ module.exports = {
 	},
 	plugins: [
 		new MiniCssPlugin(),
+		new VuePlugin(),
 		new HtmlPlugin({
 			inject: false,
 			filename: 'index.html',
