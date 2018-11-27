@@ -40,3 +40,13 @@ export class PatternItem
 		public quantity: number,
 	) {}
 }
+
+/* Helper classes */
+export class ItemInfo
+{
+	constructor(
+		public item: Item,
+		public price?: number,
+		public prices?: number[]
+	) {}
+}

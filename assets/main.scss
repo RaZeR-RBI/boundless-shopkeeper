@@ -1,5 +1,8 @@
 @import "variables.scss";
 @import "bulma.scss";
+
+$border: #242632;
+
 body {
     display: flex;
     min-height: 100vh;
@@ -14,6 +17,17 @@ body {
     max-height: unset;
 }
 
-.navbar.is-dark {
-    border-bottom: 3px solid #242632;
+.has-dark-border {
+    border-bottom: 3px solid $border;
+}
+
+.item-image {
+    background-color: $light;
+}
+
+.item-card {
+    margin: 0.25rem !important;
+    padding: 0.5rem !important;
+    background-color: $white;
+    border-radius: 3px;
 }

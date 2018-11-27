@@ -25,6 +25,7 @@
 		"sass-loader": "^7.1.0",
 		"ts-loader": "^5.3.0",
 		"typescript": "^3.1.6",
+		"underscore": "^1.9.1",
 		"vue": "^2.5.17",
 		"vue-class": "^2.0.1",
 		"vue-loader": "^15.4.2",

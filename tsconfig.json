@@ -2,12 +2,19 @@
 	"compilerOptions": {
 		"outDir": "./built/",
 		"sourceMap": true,
-		"strict": true,
+		"noImplicitThis": true,
 		"noImplicitReturns": true,
+		"noImplicitAny": false,
 		"module": "es2015",
 		"moduleResolution": "node",
 		"target": "es5",
-		"experimentalDecorators": true
+		"lib": [
+			"es2015",
+			"dom"
+		],
+		"allowJs": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true
 	},
 	"include": [
 		"./src/**/*"
