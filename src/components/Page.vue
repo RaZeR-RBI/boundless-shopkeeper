@@ -48,6 +48,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import axios from "axios";
 import { Item, ItemInfo } from "../types";
+import { priceCalculationOrder } from "../price";
 import vSelect from "vue-select";
 import ItemList from "./ItemList.vue";
 
@@ -69,6 +70,27 @@ export default class Page extends Vue {
       .get("items.json")
       .then(value => (this.items = value.data))
       .catch(err => alert(err));
+	}
+
+	get itemNames() : Map<number, string>
+	{
+		var result = new Map<number, string>();
+		for (var item of this.items)
+			result.set(item.id, item.name);
+		return result;
+	}
+
+	get presetPrices(): Map<number, number>
+	{
+		var result = new Map<number, number>();
+		for (var info of this.presetBin)
+			result.set(info.item.id, info.price);
+		return result;
+	}
+
+	get calculationOrder(): Map<number, number[]>
+	{
+		return priceCalculationOrder(this.items);
 	}
 	
 	canAddWithPrice(item: Item): boolean {
@@ -96,7 +118,7 @@ export default class Page extends Vue {
 
 	addCalculated()
 	{
-		this.calculatedBin.push(new ItemInfo(this.selectedItem, null, []));
+		this.calculatedBin.push(new ItemInfo(this.selectedItem, null));
 	}
 }
 </script>

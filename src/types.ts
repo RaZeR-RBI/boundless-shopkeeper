@@ -47,6 +47,14 @@ export class ItemInfo
 	constructor(
 		public item: Item,
 		public price?: number,
-		public prices?: number[]
+		public prices?: PriceInfo[]
+	) {}
+}
+
+export class PriceInfo
+{
+	constructor(
+		public price: number,
+		public description: string
 	) {}
 }

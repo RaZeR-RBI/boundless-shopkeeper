@@ -9,7 +9,7 @@
 			<div class="content">
 				<strong>{{ item.name }}</strong>
 				<div v-if="isPriceEditable" class="control">
-					<input type="number" class="input" v-model="itemInfo.price" />
+					<input type="number" class="input" v-model.number="itemInfo.price" />
 				</div>
 			</div>
 		</div>
@@ -20,7 +20,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
-import { Item, ItemInfo } from "../types";
+import { Item, ItemInfo, Pattern } from "../types";
 
 @Component({})
 export default class ItemCard extends Vue {
