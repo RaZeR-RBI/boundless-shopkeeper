@@ -58,3 +58,20 @@ export class PriceInfo
 		public description: string
 	) {}
 }
+
+export class Settings
+{
+	constructor(
+		public sparkCost: number,
+		public wearCost: number,
+		public powerCostPer100: number,
+		public craftItemPricing: CraftItemPricing
+	) {}
+}
+
+export enum CraftItemPricing
+{
+	Minimum,
+	Average,
+	Maximum
+}

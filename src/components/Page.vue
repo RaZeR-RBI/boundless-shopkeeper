@@ -47,8 +47,8 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import axios from "axios";
-import { Item, ItemInfo } from "../types";
-import { priceCalculationOrder } from "../price";
+import { Item, ItemInfo, Settings, CraftItemPricing } from "../types";
+import { priceCalculationOrder, calculatePrices } from "../price";
 import vSelect from "vue-select";
 import ItemList from "./ItemList.vue";
 
@@ -61,6 +61,7 @@ import ItemList from "./ItemList.vue";
 export default class Page extends Vue {
   items: Item[] = [];
 	selectedItem: Item | null = null;
+	settings: Settings = new Settings(0.05, 0, 0, CraftItemPricing.Maximum);
 	
 	presetBin: ItemInfo[] = [];
 	calculatedBin: ItemInfo[] = [];
@@ -114,11 +115,19 @@ export default class Page extends Vue {
 	addWithPrice()
 	{
 		this.presetBin.push(new ItemInfo(this.selectedItem, 0));
+		this.updateCalculatedPrices();
 	}
 
 	addCalculated()
 	{
 		this.calculatedBin.push(new ItemInfo(this.selectedItem, null));
+		this.updateCalculatedPrices();
+	}
+
+	updateCalculatedPrices()
+	{
+		this.calculatedBin = calculatePrices(this.presetBin, this.calculatedBin,
+			this.calculationOrder, this.settings);
 	}
 }
 </script>

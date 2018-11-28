@@ -11,6 +11,13 @@
 				<div v-if="isPriceEditable" class="control">
 					<input type="number" class="input" v-model.number="itemInfo.price" />
 				</div>
+				<div v-else>
+					<span class="tag"
+						v-for="price in prices" v-bind:key="price.description"
+						:title="price.description">
+						{{ price.price }}
+					</span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -20,12 +27,12 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
-import { Item, ItemInfo, Pattern } from "../types";
+import { Item, ItemInfo, Pattern, PriceInfo } from "../types";
 
 @Component({})
 export default class ItemCard extends Vue {
 
-	@Prop(ItemInfo) itemInfo: ItemInfo;
+	@Prop(Object) itemInfo: ItemInfo;
 	@Prop(Function) onDelete;
 
 	get item()
@@ -41,6 +48,11 @@ export default class ItemCard extends Vue {
 	get isPriceEditable()
 	{
 		return this.itemInfo.price != null;
+	}
+
+	get prices(): PriceInfo[]
+	{
+		return this.itemInfo.prices;
 	}
 
 	delete()
