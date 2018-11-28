@@ -9,6 +9,14 @@ body {
     flex-direction: column;
 }
 
+.footer {
+    padding: 1em;
+    a {
+        color: $white;
+        text-decoration: underline;
+    }
+}
+
 #wrapper {
     flex: 1;
 }
@@ -35,4 +43,15 @@ body {
 
 .form-control {
     @extend .input;
+}
+
+.crafting {
+    @extend .notification;
+    padding: 0.2em;
+    margin: 0.2em !important;
+    pre {
+        background-color: transparent;
+        color: white;
+        padding: 0.2em;
+    }
 }

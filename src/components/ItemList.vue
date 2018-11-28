@@ -4,6 +4,7 @@
 		<item-card v-for="item in items" v-bind:key="item.item.id"
 			:onDelete="onDelete"
 			:onChange="onChange"
+			:itemNames="itemNames"
 			:itemInfo="item">
 		</item-card>
 		<div class="notification" v-if="!items || items.length == 0">
@@ -26,6 +27,7 @@ import ItemCard from "./ItemCard.vue";
 })
 export default class ItemList extends Vue {
 	@Prop(Array) items: ItemInfo[];
+	@Prop(Map) itemNames: Map<number, string>;
 	@Prop(String) title: string;
 	@Prop(Function) onDelete;
 	@Prop(Function) onChange;

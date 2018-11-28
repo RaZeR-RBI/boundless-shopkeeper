@@ -1,5 +1,25 @@
 <template>
 	<div>
+		<div class="notification is-primary" v-if="showHelp">
+			Welcome to the price calculation tool for the 
+			<a href="https://playboundless.com/">Boundless</a>!
+			<p>
+			It can help you to calculate the price of craftable items based on the
+			ingredients used.
+			</p>
+			<p>
+			<b>To get started, set some prices for basic resources</b> - just input the
+			resource name into the "Add a new item" box (e.g., "Rough Oortstone"), then edit the price.
+			</p>
+			<p>
+			<b>Then add a craftable product that is made from the resources</b> for which
+			we have entered a price - (e.g., "Oort Shard").
+			</p>
+			<p>When everything is set, press <b>Calculate</b> button and see the results!
+			</p>
+
+			<a @click="showHelp = false" class="button is-success">OK, got it!</a>
+		</div>
 		<div class="level has-text-centered">
 			<!-- Add a new item -->
 			<div class="level-item">
@@ -30,10 +50,18 @@
 							</span>
 							<span>Use calculated</span>
 						</button>
+						<button class="button is-primary"
+							@click="showHelp = true"
+							title="Show help">
+							<span class="icon">
+								<i class="fa fa-fw fa-question"></i>
+							</span>
+							<span>Help</span>
+						</button>
 					</div>
 				</div>
 			</div>
-			<!-- Loading and saving -->
+			<!-- Controls -->
 			<div class="level-item">
 				<div>
 					<p class="heading">CONTROLS</p>
@@ -79,7 +107,9 @@
 							<a class="button is-static is-small">Spark</a>
 						</div>
 						<div class="control is-expanded">
-							<input class="input is-small" type="number" v-model.number="settings.sparkCost" />
+							<input class="input is-small" type="number" 
+								v-model.number="settings.sparkCost" 
+								@change="onUpdate()"/>
 						</div>
 						<div class="control">
 							<a class="button is-static is-small">¢ per 1</a>
@@ -90,7 +120,9 @@
 							<a class="button is-static is-small">Wear</a>
 						</div>
 						<div class="control is-expanded">
-							<input class="input is-small" type="number" v-model.number="settings.wearCost" />
+							<input class="input is-small" type="number" 
+								v-model.number="settings.wearCost" 
+								@change="onUpdate()" />
 						</div>
 						<div class="control">
 							<a class="button is-static is-small">¢ per 1</a>
@@ -101,7 +133,8 @@
 							<a class="button is-static is-small">Power</a>
 						</div>
 						<div class="control is-expanded">
-							<input class="input is-small" type="number" v-model.number="settings.powerCostPer100" />
+							<input class="input is-small" type="number" v-model.number="settings.powerCostPer100"
+								@change="onUpdate()" />
 						</div>
 						<div class="control">
 							<a class="button is-static is-small">¢ per 100</a>
@@ -118,14 +151,6 @@
 									:searchable="false"
 									:options="craftItemPricing"
 									:get-option-label="pricingLabel">
-									<!--
-									<template slot="option" slot-scope="option">
-										{{ pricingLabel(option) }}
-									</template>
-									<template slot="selected-option" slot-scope="option">
-										{{ pricingLabel(option) }}
-									</template>
-									-->
 								</v-select>
 						</div>
 					</div>
@@ -137,12 +162,14 @@
 		<div class="columns">
 			<div class="column">
 				<item-list :items="presetBin" title="Fixed price"
+					:itemNames="itemNames"
 					:onDelete="deleteFromBin(presetBin)"
 					:onChange="onUpdate">
 				</item-list>
 			</div>
 			<div class="column">
 				<item-list :items="calculatedBin" title="Calculated"
+					:itemNames="itemNames"
 					:onDelete="deleteFromBin(calculatedBin)"
 					:onChange="onUpdate">
 				</item-list>
@@ -175,6 +202,7 @@ export default class Page extends Vue {
 	calculatedBin: ItemInfo[] = [];
 	
 	requiresUpdating = false;
+	showHelp = false;
 
   mounted() {
     axios
@@ -212,7 +240,7 @@ export default class Page extends Vue {
   canAddWithPrice(item: Item): boolean {
     if (!item) return false;
     if (this.contains(this.presetBin, item)) return false;
-    return !this.contains(this.presetBin, item);
+    return !this.contains(this.calculatedBin, item);
   }
 
   canAddCalculated(item: Item): boolean {

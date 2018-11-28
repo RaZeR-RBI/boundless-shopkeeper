@@ -9,7 +9,12 @@
 			<div class="content">
 				<strong>{{ item.name }}</strong>
 				<div v-if="isPriceEditable" class="control">
-					<input type="number" class="input" v-model.number="itemInfo.price" @change="change"/>
+					<div class="field has-addons">
+						<input type="number" class="input is-small"
+							style="width: 10rem"
+							v-model.number="itemInfo.price" @change="change"/>
+						<a class="button is-static is-small">¢</a>
+					</div>
 				</div>
 				<div v-else>
 					<div class="tags">
@@ -19,6 +24,14 @@
 							{{ formatPrice(price.price) }}
 						</span>
 					</div>
+				</div>
+				<a @click="toggleCrafting()" v-if="!notCraftable">
+					<small>Show/hide crafting recipe</small>
+				</a>
+				<div class="crafting is-primary" v-for="info in craftInfo"
+					v-if="showCrafting"
+					v-bind:key="info">
+					<pre>{{ info }}</pre>
 				</div>
 			</div>
 		</div>
@@ -35,13 +48,22 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import { Item, ItemInfo, Pattern, PriceInfo } from "../types";
+import { patternInfo } from "../price";
 
 @Component({})
 export default class ItemCard extends Vue {
 
 	@Prop(Object) itemInfo: ItemInfo;
+	@Prop(Map) itemNames: Map<number, string>;
 	@Prop(Function) onDelete;
 	@Prop(Function) onChange;
+
+	showCrafting = false;
+
+	toggleCrafting()
+	{
+		this.showCrafting = !this.showCrafting;
+	}
 
 	get item()
 	{
@@ -61,6 +83,22 @@ export default class ItemCard extends Vue {
 	get prices(): PriceInfo[]
 	{
 		return this.itemInfo.prices;
+	}
+
+	get craftInfo(): string[] | null
+	{
+		if (!this.itemNames) { return null; }
+		const item = this.itemInfo.item;
+		if (this.notCraftable) {
+			return null;
+		}
+		return item.pattern.map(p => patternInfo(p, this.itemNames));
+	}
+
+	get notCraftable() {
+		const item = this.itemInfo.item;
+		console.dir(item);
+		return !item.pattern || item.pattern.length == 0;
 	}
 
 	formatPrice(value: number): string

@@ -88,6 +88,18 @@ function descriptionForPattern(pattern: Pattern, lookup: Map<number, ItemInfo>):
 	}).join("\n") + "=> x " + pattern.quantity + "\n";
 }
 
+export function patternInfo(pattern: Pattern, itemNames: Map<number, string>): string
+{
+	return pattern.item_pattern.map((val, i, a) => {
+		var name = "???";
+		if (itemNames.has(val.item_id)) {
+			name = itemNames.get(val.item_id);
+		}
+		const qty = val.quantity;
+		return qty + " x " + name + "\n";
+	}).join("\n") + "=> x " + pattern.quantity + "\n";
+}
+
 function calculatePrice(
 	lookup: Map<number, ItemInfo>, info: ItemInfo, settings: Settings
 ): PriceInfo[]

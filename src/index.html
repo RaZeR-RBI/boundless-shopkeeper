@@ -28,8 +28,17 @@
 	<section id="wrapper" class="has-background-light">
 		<div id="app"></div>
 	</section>
-	<footer class="footer has-dark-border has-text-light has-text-centered">
-		Copyright
+	<footer class="footer has-dark-border has-text-light has-text-centered is-size-7">
+		<p>
+				This website is not affiliated with Wonderstruck, Turbulenz or Square Enix 
+				and is a fan-made creation that serves only informative purpose.
+				All trademarks are property of their respective owners in the US and other countries. 
+		</p>
+		<p>&copy; 
+			<a href="https://github.com/RaZeR-RBI" target="_blank">
+				Adel Vilkov (aka RaZeR-RBI)
+			</a>
+		</p>
 	</footer>
 	<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
 		<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
