@@ -153,9 +153,8 @@ export function calculatePrices(
 			}
 			var prices = calculatePrice(lookup, item, settings);
 			// clone our current item and add it to our lookup
-			var clone = Object.assign({}, item);
-			clone.prices = prices;
-			lookup.set(item.item.id, clone);
+			item.prices = prices;
+			lookup.set(item.item.id, item);
 		}		
 	}
 

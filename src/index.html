@@ -14,10 +14,10 @@
 <body>
 	<nav class="navbar is-dark has-dark-border" role="navigation" aria-label="main navigation">
 		<div class="navbar-brand">
-			<a class="navbar-item" href="https://bulma.io">
+			<a class="navbar-item">
 				<img src="logo.png" alt="Boundless Shopkeeper" width="36" height="36">
+				<label class="label has-text-light">SHOPKEEPER</label>
 			</a>
-
 			<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
 				<span aria-hidden="true"></span>
 				<span aria-hidden="true"></span>
@@ -28,6 +28,9 @@
 	<section id="wrapper" class="has-background-light">
 		<div id="app"></div>
 	</section>
+	<footer class="footer has-dark-border has-text-light has-text-centered">
+		Copyright
+	</footer>
 	<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
 		<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
 		<% } %>

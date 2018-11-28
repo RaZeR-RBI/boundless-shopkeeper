@@ -71,7 +71,7 @@ export class Settings
 
 export enum CraftItemPricing
 {
-	Minimum,
-	Average,
-	Maximum
+	Minimum = 1,
+	Average = 2,
+	Maximum = 3
 }

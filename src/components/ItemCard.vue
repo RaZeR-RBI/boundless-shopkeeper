@@ -9,16 +9,23 @@
 			<div class="content">
 				<strong>{{ item.name }}</strong>
 				<div v-if="isPriceEditable" class="control">
-					<input type="number" class="input" v-model.number="itemInfo.price" />
+					<input type="number" class="input" v-model.number="itemInfo.price" @change="change"/>
 				</div>
 				<div v-else>
-					<span class="tag"
-						v-for="price in prices" v-bind:key="price.description"
-						:title="price.description">
-						{{ price.price }}
-					</span>
+					<div class="tags">
+						<span class="tag"
+							v-for="price in prices" v-bind:key="price.description"
+							:title="price.description">
+							{{ formatPrice(price.price) }}
+						</span>
+					</div>
 				</div>
 			</div>
+		</div>
+		<div class="media-right">
+			<a @click="remove()">
+				<small class="has-text-danger"><i class="fa fa-times"></i></small>
+			</a>
 		</div>
 	</div>
 </template>
@@ -34,6 +41,7 @@ export default class ItemCard extends Vue {
 
 	@Prop(Object) itemInfo: ItemInfo;
 	@Prop(Function) onDelete;
+	@Prop(Function) onChange;
 
 	get item()
 	{
@@ -55,10 +63,21 @@ export default class ItemCard extends Vue {
 		return this.itemInfo.prices;
 	}
 
-	delete()
+	formatPrice(value: number): string
+	{
+		return (Math.round(value * 10) / 10) + ' ¢';
+	}
+
+	remove()
 	{
 		if (!this.onDelete) return;
 		this.onDelete(this.itemInfo);
+	}
+
+	change()
+	{
+		if (!this.onChange) return;
+		this.onChange(this.itemInfo);
 	}
 }
 </script>

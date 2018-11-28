@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Francois+One|Merriweather+Sans');
-h1, h2, h3, h4, h5, h6, label {
-    font-family: 'Francois One'
+h1, h2, h3, h4, h5, h6, label, button {
+    font-family: 'Francois One' !important
 }
 
 $light: #CACDD4;
@@ -10,5 +10,6 @@ $success: #62B452;
 
 $family-sans-serif: 'Merriweather Sans';
 $body-background-color: $light;
+$footer-background-color: $dark;
 
 @import '../node_modules/bulma/sass/utilities/_all.sass';

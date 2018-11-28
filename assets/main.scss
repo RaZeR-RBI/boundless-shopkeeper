@@ -15,6 +15,7 @@ body {
 
 .navbar-item img {
     max-height: unset;
+    margin-right: 1em;
 }
 
 .has-dark-border {
@@ -30,4 +31,8 @@ body {
     padding: 0.5rem !important;
     background-color: $white;
     border-radius: 3px;
+}
+
+.form-control {
+    @extend .input;
 }
