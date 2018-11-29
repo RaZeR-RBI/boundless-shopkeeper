@@ -1,0 +1,57 @@
+
+.controls-right {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+.controls-right a {
+    color: white;
+}
+.controls-right a.is-active {
+    color: #62b452;
+}
+
+
+#item-select {
+  width: 100vw;
+  max-width: 25rem;
+}
+#item-select .dropdown-toggle {
+    background: white;
+    width: 100%;
+}
+.item-list {
+  margin: 0 0.5rem;
+}
+.level-item {
+  margin-top: 1rem;
+}
+.calc-settings {
+  max-width: 250px;
+}
+.calc-settings .field {
+    margin: 0.25rem;
+}
+.calc-settings input {
+    width: 100%;
+}
+.calc-settings .dropdown {
+    font-size: 0.75rem;
+    height: 1.75rem;
+}
+.calc-settings .dropdown-toggle {
+    background: white !important;
+}
+.calc-settings .dropdown,
+  .calc-settings .dropdown-toggle {
+    width: 100%;
+}
+.calc-settings .selected-tag {
+    margin: 0 !important;
+    padding: 2px !important;
+}
+.calc-settings .button.is-static {
+    background-color: #656980;
+    color: white;
+}
+

@@ -4,21 +4,28 @@
 			Welcome to the price calculation tool for the 
 			<a href="https://playboundless.com/">Boundless</a>!
 			<p>
-			It can help you to calculate the price of craftable items based on the
-			ingredients used.
+				It can help you to calculate the price of craftable items based on the
+				ingredients used.
 			</p>
 			<p>
-			<b>To get started, set some prices for basic resources</b> - just input the
-			resource name into the "Add a new item" box (e.g., "Rough Oortstone"), then edit the price.
+			<b>
+				To get started, set some prices for basic resources</b> - just input the
+				resource name into the "Add a new item" box (e.g., "Rough Oortstone"), then edit the price.
 			</p>
 			<p>
-			<b>Then add a craftable product that is made from the resources</b> for which
-			we have entered a price - (e.g., "Oort Shard").
+			<b>
+				Then add a craftable product that is made from the resources</b> for which
+				we have entered a price - (e.g., "Oort Shard").
 			</p>
-			<p>When everything is set, press <b>Calculate</b> button and see the results!
+			<p>
+				When everything is set, press <b>Calculate</b> button and see the results!
 			</p>
-			<p>Keep in mind - when you modify any settings, prices or items - you need to
+			<p>
+				Keep in mind - when you modify any settings, prices or items - you need to
 				press "Calculate" again (it should became active) to update the prices.
+			</p>
+			<p>
+				Hover over button, dropdown or input field if you're unsure what it does.
 			</p>
 			<p>Have fun!</p>
 
@@ -152,7 +159,8 @@
 						<div class="control">
 							<a class="button is-static is-small">Source price</a>
 						</div>
-						<div class="control is-expanded">
+						<div class="control is-expanded" 
+							title="Which price from source items is selected if there are multiple">
 								<v-select 
 									v-model="settings.craftItemPricing"
 									:clearable="false"
@@ -216,7 +224,13 @@ export default class Page extends Vue {
   mounted() {
     axios
       .get("items.json")
-      .then(value => (this.items = value.data))
+      .then(value => (this.items = value.data.sort((a: Item, b: Item) => {
+					if (a.name < b.name)
+						return -1;
+					if (a.name > b.name)
+						return 1;
+					return 0;
+			})))
       .catch(err => alert(err));
   }
 

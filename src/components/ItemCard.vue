@@ -2,7 +2,7 @@
 	<div class="item-card media">
 		<figure class="media-left">
 			<p class="image is-64x64 item-image">
-				<img :src="iconUrl" />
+				<img :src="iconUrl" onerror="this.style.visibility='hidden'"/>
 			</p>
 		</figure>
 		<div class="media-content">
