@@ -17,8 +17,13 @@
 			</p>
 			<p>When everything is set, press <b>Calculate</b> button and see the results!
 			</p>
+			<p>Keep in mind - when you modify any settings, prices or items - you need to
+				press "Calculate" again (it should became active) to update the prices.
+			</p>
+			<p>Have fun!</p>
 
 			<a @click="showHelp = false" class="button is-success">OK, got it!</a>
+			<a @click="loadSample()" class="button is-warning">Show me a sample, please!</a>
 		</div>
 		<div class="level has-text-centered">
 			<!-- Add a new item -->
@@ -109,6 +114,7 @@
 						<div class="control is-expanded">
 							<input class="input is-small" type="number" 
 								v-model.number="settings.sparkCost" 
+								min="0" max="99999999" step="0.01"
 								@change="onUpdate()"/>
 						</div>
 						<div class="control">
@@ -122,6 +128,7 @@
 						<div class="control is-expanded">
 							<input class="input is-small" type="number" 
 								v-model.number="settings.wearCost" 
+								min="0" max="99999999" step="1"
 								@change="onUpdate()" />
 						</div>
 						<div class="control">
@@ -134,6 +141,7 @@
 						</div>
 						<div class="control is-expanded">
 							<input class="input is-small" type="number" v-model.number="settings.powerCostPer100"
+								min="0" max="99999999" step="1"
 								@change="onUpdate()" />
 						</div>
 						<div class="control">
@@ -212,6 +220,7 @@ export default class Page extends Vue {
       .catch(err => alert(err));
   }
 
+	/* Various calculated props to aid calculation and display */
   get itemNames(): Map<number, string> {
     var result = new Map<number, string>();
     for (var item of this.items) result.set(item.id, item.name);
@@ -228,6 +237,7 @@ export default class Page extends Vue {
     return priceCalculationOrder(this.items);
   }
 
+	/* Pricing options */
   get craftItemPricing(): CraftItemPricing[] {
     return Object.keys(CraftItemPricing)
       .filter(k => typeof CraftItemPricing[k as any] === "number")
@@ -238,6 +248,7 @@ export default class Page extends Vue {
     return CraftItemPricing[v];
   }
 
+	/* Item addition */
   canAddWithPrice(item: Item): boolean {
     if (!item) return false;
     if (this.contains(this.presetBin, item)) return false;
@@ -265,6 +276,7 @@ export default class Page extends Vue {
     this.onUpdate();
   }
 
+	/* Price management */
   onUpdate() {
     this.requiresUpdating = true;
   }
@@ -279,6 +291,7 @@ export default class Page extends Vue {
     this.requiresUpdating = false;
   }
 
+	/* Deletion handler */
   deleteFromBin(bin: ItemInfo[]) {
     return function(item: ItemInfo) {
       var index = bin.indexOf(item);
@@ -327,6 +340,20 @@ export default class Page extends Vue {
 		var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
 		FileSaver.saveAs(blob, "shopkeeper.json");
 	}
+
+	/* Sample load */
+	loadSample()
+	{
+		axios.get('sample.json')
+			.then(response => {
+				var result = response.data as FileData;
+				this.settings = result.settings;
+				this.presetBin = result.preset;
+				this.calculatedBin = result.calculated;
+				this.updateCalculatedPrices();
+			})
+      .catch(err => alert(err));
+	}
 }
 </script>
 
@@ -366,6 +393,14 @@ export default class Page extends Vue {
   .dropdown,
   .dropdown-toggle {
     width: 100%;
-  }
+	}
+	.selected-tag {
+		margin: 0 !important;
+		padding: 2px !important;
+	}
+	.button.is-static {
+	    background-color: #656980;
+	    color: white;
+	}
 }
 </style>

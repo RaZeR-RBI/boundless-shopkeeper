@@ -8,10 +8,11 @@
 		<div class="media-content">
 			<div class="content">
 				<strong>{{ item.name }}</strong>
+				<span class="tag is-success is-pulled-right">{{ item.item_type.name }}</span>
 				<div v-if="isPriceEditable" class="control">
 					<div class="field has-addons">
 						<input type="number" class="input is-small"
-							style="width: 10rem"
+							style="max-width: 10rem"
 							v-model.number="itemInfo.price" @change="change"/>
 						<a class="button is-static is-small">¢</a>
 					</div>
@@ -26,7 +27,8 @@
 					</div>
 				</div>
 				<a @click="toggleCrafting()" v-if="!notCraftable">
-					<small>Show/hide crafting recipe</small>
+					<small v-if="showCrafting">Hide crafting recipe</small>
+					<small v-else>Show crafting recipe</small>
 				</a>
 				<div class="crafting is-primary" v-for="info in craftInfo"
 					v-if="showCrafting"

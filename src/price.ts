@@ -78,7 +78,7 @@ function aggregatePrices(prices: PriceInfo[] | null, strategy: CraftItemPricing)
 
 function descriptionForPattern(pattern: Pattern, lookup: Map<number, ItemInfo>): string
 {
-	var params = "";
+	var params = "\n";
 	if (pattern.power > 0) {
 		params += "Power: " + pattern.power + "\n";
 	}
@@ -91,13 +91,13 @@ function descriptionForPattern(pattern: Pattern, lookup: Map<number, ItemInfo>):
 			name = lookup.get(val.item_id).item.name;
 		}
 		const qty = val.quantity;
-		return qty + " x " + name + "\n";
+		return qty + " x " + name;
 	}).join("\n") + params + "≫ " + pattern.quantity + "x\n";
 }
 
 export function patternInfo(pattern: Pattern, itemNames: Map<number, string>): string
 {
-	var params = "";
+	var params = "\n";
 	if (pattern.power > 0) {
 		params += "Power: " + pattern.power + "\n";
 	}
@@ -110,7 +110,7 @@ export function patternInfo(pattern: Pattern, itemNames: Map<number, string>): s
 			name = itemNames.get(val.item_id);
 		}
 		const qty = val.quantity;
-		return qty + " x " + name + "\n";
+		return qty + " x " + name;
 	}).join("\n") + params + "≫ " + pattern.quantity + "x\n";
 }
 
