@@ -75,3 +75,12 @@ export enum CraftItemPricing
 	Average = 2,
 	Maximum = 3
 }
+
+export class FileData
+{
+	constructor(
+		public settings: Settings,
+		public preset: ItemInfo[],
+		public calculated: ItemInfo[]
+	) {}
+}

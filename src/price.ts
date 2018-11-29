@@ -78,6 +78,13 @@ function aggregatePrices(prices: PriceInfo[] | null, strategy: CraftItemPricing)
 
 function descriptionForPattern(pattern: Pattern, lookup: Map<number, ItemInfo>): string
 {
+	var params = "";
+	if (pattern.power > 0) {
+		params += "Power: " + pattern.power + "\n";
+	}
+	if (pattern.spark > 0) {
+		params += "Spark: " + pattern.spark + "\n";
+	}
 	return pattern.item_pattern.map((val, i, a) => {
 		var name = "???";
 		if (lookup.has(val.item_id)) {
@@ -85,11 +92,18 @@ function descriptionForPattern(pattern: Pattern, lookup: Map<number, ItemInfo>):
 		}
 		const qty = val.quantity;
 		return qty + " x " + name + "\n";
-	}).join("\n") + "=> x " + pattern.quantity + "\n";
+	}).join("\n") + params + "≫ " + pattern.quantity + "x\n";
 }
 
 export function patternInfo(pattern: Pattern, itemNames: Map<number, string>): string
 {
+	var params = "";
+	if (pattern.power > 0) {
+		params += "Power: " + pattern.power + "\n";
+	}
+	if (pattern.spark > 0) {
+		params += "Spark: " + pattern.spark + "\n";
+	}
 	return pattern.item_pattern.map((val, i, a) => {
 		var name = "???";
 		if (itemNames.has(val.item_id)) {
@@ -97,7 +111,7 @@ export function patternInfo(pattern: Pattern, itemNames: Map<number, string>): s
 		}
 		const qty = val.quantity;
 		return qty + " x " + name + "\n";
-	}).join("\n") + "=> x " + pattern.quantity + "\n";
+	}).join("\n") + params + "≫ " + pattern.quantity + "x\n";
 }
 
 function calculatePrice(

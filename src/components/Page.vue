@@ -67,7 +67,7 @@
 					<p class="heading">CONTROLS</p>
 					<div class="file" style="margin-bottom: 0.25rem">
 					  <label class="file-label">
-					    <input class="file-input" type="file" name="resume">
+					    <input class="file-input" type="file" name="import" @change="fileUploadHandler">
 					    <span class="file-cta">
 					      <span class="file-icon">
 					        <i class="fas fa-upload"></i>
@@ -79,7 +79,7 @@
 					  </label>
 					</div>
 					<div class="control is-fullwidth" style="margin-bottom: 0.25rem">
-						<button class="button is-success is-fullwidth">
+						<button class="button is-success is-fullwidth" @click="exportAsFile()">
 							<div class="icon">
 								<i class="fa fa-fw fa-download"></i>
 							</div>
@@ -182,10 +182,11 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import axios from "axios";
-import { Item, ItemInfo, Settings, CraftItemPricing } from "../types";
+import { Item, ItemInfo, Settings, CraftItemPricing, FileData } from "../types";
 import { priceCalculationOrder, calculatePrices } from "../price";
 import vSelect from "vue-select";
 import ItemList from "./ItemList.vue";
+import FileSaver from "file-saver";
 
 @Component({
   components: {
@@ -199,10 +200,10 @@ export default class Page extends Vue {
   settings: Settings = new Settings(0.05, 0, 0, CraftItemPricing.Maximum);
 
   presetBin: ItemInfo[] = [];
-	calculatedBin: ItemInfo[] = [];
-	
-	requiresUpdating = false;
-	showHelp = false;
+  calculatedBin: ItemInfo[] = [];
+
+  requiresUpdating = false;
+  showHelp = false;
 
   mounted() {
     axios
@@ -228,9 +229,9 @@ export default class Page extends Vue {
   }
 
   get craftItemPricing(): CraftItemPricing[] {
-		return Object.keys(CraftItemPricing)
-			.filter(k => typeof CraftItemPricing[k as any] === "number")
-			.map(k => CraftItemPricing[k]);
+    return Object.keys(CraftItemPricing)
+      .filter(k => typeof CraftItemPricing[k as any] === "number")
+      .map(k => CraftItemPricing[k]);
   }
 
   pricingLabel(v: number): string {
@@ -262,11 +263,11 @@ export default class Page extends Vue {
   addCalculated() {
     this.calculatedBin.push(new ItemInfo(this.selectedItem, null));
     this.onUpdate();
-	}
-	
-	onUpdate() {
-		this.requiresUpdating = true;
-	}
+  }
+
+  onUpdate() {
+    this.requiresUpdating = true;
+  }
 
   updateCalculatedPrices() {
     this.calculatedBin = calculatePrices(
@@ -274,8 +275,8 @@ export default class Page extends Vue {
       this.calculatedBin,
       this.calculationOrder,
       this.settings
-		);
-		this.requiresUpdating = false;
+    );
+    this.requiresUpdating = false;
   }
 
   deleteFromBin(bin: ItemInfo[]) {
@@ -287,6 +288,45 @@ export default class Page extends Vue {
       bin.splice(index, 1);
     };
   }
+
+  /* Importing */
+  get fileUploadHandler(): (any) => void {
+    const onLoad = event => {
+      try {
+        var obj = JSON.parse(event.target.result);
+        if (!obj.settings || !obj.preset || !obj.calculated) {
+          throw MediaError;
+        }
+        var data = obj as FileData;
+        this.settings = data.settings;
+        this.presetBin = data.preset;
+        this.calculatedBin = data.calculated;
+        this.updateCalculatedPrices();
+      } catch (e) {
+        alert("We could not read your file :(");
+        console.error(e);
+      }
+    };
+
+    return event => {
+      try {
+        var reader = new FileReader();
+        reader.onload = onLoad;
+        reader.readAsText(event.target.files[0]);
+      } catch (e) {
+        alert("We could not read your file :(");
+        console.error(e);
+      }
+    };
+	}
+	
+	/* Exporting */
+	exportAsFile()
+	{
+		var data = new FileData(this.settings, this.presetBin, this.calculatedBin);
+		var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+		FileSaver.saveAs(blob, "shopkeeper.json");
+	}
 }
 </script>
 
@@ -315,15 +355,16 @@ export default class Page extends Vue {
   max-width: 250px;
   input {
     width: 100%;
-	}
-	.dropdown {
-		font-size: 0.75rem;
-		height: 1.75rem;
-	}
-	.dropdown-toggle {
-		background: white !important;
-	}
-  .dropdown, .dropdown-toggle {
+  }
+  .dropdown {
+    font-size: 0.75rem;
+    height: 1.75rem;
+  }
+  .dropdown-toggle {
+    background: white !important;
+  }
+  .dropdown,
+  .dropdown-toggle {
     width: 100%;
   }
 }

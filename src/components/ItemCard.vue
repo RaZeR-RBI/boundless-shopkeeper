@@ -97,7 +97,6 @@ export default class ItemCard extends Vue {
 
 	get notCraftable() {
 		const item = this.itemInfo.item;
-		console.dir(item);
 		return !item.pattern || item.pattern.length == 0;
 	}
 
