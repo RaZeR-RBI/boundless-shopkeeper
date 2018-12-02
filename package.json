@@ -4,10 +4,9 @@
 	"description": "Boundless price calculator tool for shops",
 	"main": "index.js",
 	"scripts": {
-		"build": "rimraf dist && webpack",
-		"build-prod": "rimraf dist && webpack --mode=production",
-		"build-watch": "rimraf dist && webpack --watch --progress",
-		"dev": "webpack-dev-server",
+		"build": "NODE_ENV=development; rimraf dist && webpack",
+		"build-prod": "NODE_ENV=production; rimraf dist && webpack",
+		"dev": "NODE_ENV=development; webpack-dev-server",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Adel Vilkov (RaZeR-RBI)",

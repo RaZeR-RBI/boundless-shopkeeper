@@ -224,17 +224,18 @@ export default class Page extends Vue {
   mounted() {
     axios
       .get("items.json")
-      .then(value => (this.items = value.data.sort((a: Item, b: Item) => {
-					if (a.name < b.name)
-						return -1;
-					if (a.name > b.name)
-						return 1;
-					return 0;
-			})))
+      .then(
+        value =>
+          (this.items = value.data.sort((a: Item, b: Item) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
+          }))
+      )
       .catch(err => alert(err));
   }
 
-	/* Various calculated props to aid calculation and display */
+  /* Various calculated props to aid calculation and display */
   get itemNames(): Map<number, string> {
     var result = new Map<number, string>();
     for (var item of this.items) result.set(item.id, item.name);
@@ -251,7 +252,7 @@ export default class Page extends Vue {
     return priceCalculationOrder(this.items);
   }
 
-	/* Pricing options */
+  /* Pricing options */
   get craftItemPricing(): CraftItemPricing[] {
     return Object.keys(CraftItemPricing)
       .filter(k => typeof CraftItemPricing[k as any] === "number")
@@ -262,7 +263,7 @@ export default class Page extends Vue {
     return CraftItemPricing[v];
   }
 
-	/* Item addition */
+  /* Item addition */
   canAddWithPrice(item: Item): boolean {
     if (!item) return false;
     if (this.contains(this.presetBin, item)) return false;
@@ -290,7 +291,7 @@ export default class Page extends Vue {
     this.onUpdate();
   }
 
-	/* Price management */
+  /* Price management */
   onUpdate() {
     this.requiresUpdating = true;
   }
@@ -305,7 +306,7 @@ export default class Page extends Vue {
     this.requiresUpdating = false;
   }
 
-	/* Deletion handler */
+  /* Deletion handler */
   deleteFromBin(bin: ItemInfo[]) {
     return function(item: ItemInfo) {
       var index = bin.indexOf(item);
@@ -317,6 +318,23 @@ export default class Page extends Vue {
   }
 
   /* Importing */
+  replaceWithActualItemInfo(bin: ItemInfo[]) {
+    var invalidItemIndexes: number[] = [];
+    var index = 0;
+    for (var info of bin) {
+      var actualItemIndex = this.items.findIndex(i => i.id == info.item.id);
+      if (actualItemIndex !== -1) {
+        info.item = this.items[actualItemIndex];
+      } else {
+        invalidItemIndexes.push(index);
+      }
+      index++;
+    }
+    for (var index of invalidItemIndexes) {
+      bin.splice(index, 1);
+    }
+  }
+
   get fileUploadHandler(): (any) => void {
     const onLoad = event => {
       try {
@@ -328,6 +346,8 @@ export default class Page extends Vue {
         this.settings = data.settings;
         this.presetBin = data.preset;
         this.calculatedBin = data.calculated;
+				this.replaceWithActualItemInfo(this.presetBin);
+				this.replaceWithActualItemInfo(this.calculatedBin);
         this.updateCalculatedPrices();
       } catch (e) {
         alert("We could not read your file :(");
@@ -345,29 +365,30 @@ export default class Page extends Vue {
         console.error(e);
       }
     };
-	}
-	
-	/* Exporting */
-	exportAsFile()
-	{
-		var data = new FileData(this.settings, this.presetBin, this.calculatedBin);
-		var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-		FileSaver.saveAs(blob, "shopkeeper.json");
-	}
+  }
 
-	/* Sample load */
-	loadSample()
-	{
-		axios.get('sample.json')
-			.then(response => {
-				var result = response.data as FileData;
-				this.settings = result.settings;
-				this.presetBin = result.preset;
-				this.calculatedBin = result.calculated;
-				this.updateCalculatedPrices();
-			})
+  /* Exporting */
+  exportAsFile() {
+    var data = new FileData(this.settings, this.presetBin, this.calculatedBin);
+    var blob = new Blob([JSON.stringify(data)], {
+      type: "application/json;charset=utf-8"
+    });
+    FileSaver.saveAs(blob, "shopkeeper.json");
+  }
+
+  /* Sample load */
+  loadSample() {
+    axios
+      .get("sample.json")
+      .then(response => {
+        var result = response.data as FileData;
+        this.settings = result.settings;
+        this.presetBin = result.preset;
+        this.calculatedBin = result.calculated;
+        this.updateCalculatedPrices();
+      })
       .catch(err => alert(err));
-	}
+  }
 }
 </script>
 
@@ -407,14 +428,14 @@ export default class Page extends Vue {
   .dropdown,
   .dropdown-toggle {
     width: 100%;
-	}
-	.selected-tag {
-		margin: 0 !important;
-		padding: 2px !important;
-	}
-	.button.is-static {
-	    background-color: #656980;
-	    color: white;
-	}
+  }
+  .selected-tag {
+    margin: 0 !important;
+    padding: 2px !important;
+  }
+  .button.is-static {
+    background-color: #656980;
+    color: white;
+  }
 }
 </style>

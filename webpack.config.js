@@ -6,7 +6,7 @@ var CopyPlugin = require('copy-webpack-plugin');
 var MiniCssPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-	mode: 'development',
+	mode: process.env.NODE_ENV,
 	entry: {
 		style: './assets/main.scss',
 		index: './src/index.ts'
@@ -81,7 +81,7 @@ module.exports = {
 			}
 		}
 	},
-	devtool: '#eval-source-map',
+	devtool: '#source-map',
 	watchOptions: {
 		ignored: /node_modules/
 	},
@@ -100,25 +100,4 @@ module.exports = {
 			test: /.*\.(png|jpg|jpeg|gif|svg|json)$/
 		}]),
 	]
-}
-
-if (process.env.NODE_ENV === 'production') {
-	module.exports.devtool = false; // or #source-map
-	// http://vue-loader.vuejs.org/en/workflow/production.html
-	module.exports.plugins = (module.exports.plugins || []).concat([
-		new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: '"production"'
-			}
-		}),
-		new webpack.optimize.UglifyJsPlugin({
-			sourceMap: false, // true to enable source map
-			compress: {
-				warnings: false
-			}
-		}),
-		new webpack.LoaderOptionsPlugin({
-			minimize: true
-		})
-	])
 }
