@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<div class="notification is-primary" v-if="showHelp">
-			Welcome to the price calculation tool for the 
-			<a href="https://playboundless.com/">Boundless</a>!
+		<div class="notification is-primary is-radiusless" v-if="showHelp">
 			<p>
+			  Welcome to the price calculation tool for the 
+			  <a href="https://playboundless.com/">Boundless</a>!
 				It can help you to calculate the price of craftable items based on the
 				ingredients used.
 			</p>
@@ -19,13 +19,9 @@
 			</p>
 			<p>
 				When everything is set, press <b>Calculate</b> button and see the results!
-			</p>
-			<p>
 				Keep in mind - when you modify any settings, prices or items - you need to
-				press "Calculate" again (it should became active) to update the prices.
-			</p>
-			<p>
-				Hover over button, dropdown or input field if you're unsure what it does.
+				press "Calculate" again (it should become active) to update the prices.
+				Hover over a button, dropdown or input field if you're unsure what it does.
 			</p>
 			<p>Have fun!</p>
 

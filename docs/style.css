@@ -6946,7 +6946,11 @@ body {
   padding: 1em; }
   .footer a {
     color: white;
-    text-decoration: underline; }
+    font-weight: bold; }
+  .footer p {
+    margin-bottom: 0.5em; }
+    .footer p:last-of-type {
+      margin-bottom: 0; }
 
 #wrapper {
   flex: 1; }
@@ -6974,6 +6978,9 @@ body {
     background-color: transparent;
     color: white;
     padding: 0.2em; }
+
+.notification p, .crafting p {
+  margin-bottom: 0.5em; }
 
 
 /*# sourceMappingURL=style.css.map*/

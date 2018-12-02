@@ -14,7 +14,14 @@ body {
     padding: 1em;
     a {
         color: $white;
-        text-decoration: underline;
+        font-weight: bold;
+    }
+    p {
+        margin-bottom: 0.5em;
+        &:last-of-type()
+        {
+            margin-bottom: 0;
+        }
     }
 }
 
@@ -55,4 +62,9 @@ body {
         color: white;
         padding: 0.2em;
     }
+}
+
+.notification p
+{
+    margin-bottom: 0.5em;
 }
