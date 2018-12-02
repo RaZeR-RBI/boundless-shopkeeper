@@ -1,4 +1,9 @@
 
+.is-missing-price {
+  background: #fcd4d0;
+}
+
+
 .controls-right {
   position: absolute;
   top: 0px;

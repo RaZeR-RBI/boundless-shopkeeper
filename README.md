@@ -19,8 +19,10 @@ npm run dev
 ```
 To build, use:
 ```
-npm run build
-npm run build --mode=production
+# for development
+npm run build 
+# for production
+npm run build-prod
 ```
 
 Have fun!

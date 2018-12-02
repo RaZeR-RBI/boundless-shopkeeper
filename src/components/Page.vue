@@ -203,6 +203,7 @@ import { priceCalculationOrder, calculatePrices } from "../price";
 import vSelect from "vue-select";
 import ItemList from "./ItemList.vue";
 import FileSaver from "file-saver";
+import { Watch } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -291,7 +292,13 @@ export default class Page extends Vue {
     this.onUpdate();
   }
 
-  /* Price management */
+	/* Price management */
+	@Watch('settings', { deep: true })
+	onSettingsChange()
+	{
+		this.onUpdate();
+	}
+
   onUpdate() {
     this.requiresUpdating = true;
   }

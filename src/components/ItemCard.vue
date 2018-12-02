@@ -1,5 +1,5 @@
 <template>
-	<div class="item-card media">
+	<div class="item-card media" :class="styling">
 		<figure class="media-left">
 			<p class="image is-64x64 item-image">
 				<img :src="iconUrl" onerror="this.style.visibility='hidden'"/>
@@ -82,9 +82,30 @@ export default class ItemCard extends Vue {
 		return this.itemInfo.price != null;
 	}
 
+	get styling()
+	{
+		const missingPrice = !this.itemInfo.price && 
+			(!this.itemInfo.prices || this.itemInfo.prices.length == 0);
+		return {
+			'is-missing-price': missingPrice
+		};
+	}
+
 	get prices(): PriceInfo[]
 	{
-		return this.itemInfo.prices;
+		if (!this.itemInfo.prices) {
+			return [];
+		}
+		return this.itemInfo.prices.slice()
+			.sort((a, b) => {
+				if (a.price > b.price) {
+					return 1;
+				}
+				if (a.price < b.price) {
+					return -1;
+				}
+				return 0;
+			});
 	}
 
 	get craftInfo(): string[] | null
@@ -120,3 +141,10 @@ export default class ItemCard extends Vue {
 	}
 }
 </script>
+
+<style lang="scss">
+	.is-missing-price {
+		background: lighten(#F14F42, 30%);
+	}
+</style>
+
