@@ -1,10 +1,5 @@
 <template>
 	<div class="item-card media" :class="styling">
-		<figure class="media-left">
-			<p class="image is-64x64 item-image">
-				<img :src="iconUrl" onerror="this.style.visibility='hidden'"/>
-			</p>
-		</figure>
 		<div class="media-content">
 			<div class="content">
 				<strong>{{ item.name }}</strong>
