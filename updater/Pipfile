@@ -8,6 +8,8 @@ name = "pypi"
 [packages]
 
 requests = "*"
+beautifulsoup4 = "*"
+python-slugify = "*"
 
 
 [dev-packages]
