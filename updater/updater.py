@@ -1,10 +1,14 @@
 import json
 import re
 import requests
+import time
+import threading
 from itertools import chain, cycle, islice
-from os import makedirs
+from os import makedirs, getpid
 from os.path import abspath, dirname
 from pprint import pprint
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+from threading import get_ident
 from typing import Dict, Tuple, List, Set
 from bs4 import BeautifulSoup
 from slugify import slugify
@@ -35,6 +39,8 @@ ITEM_CATEGORIES = {
 }
 
 session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(pool_connections=8, pool_maxsize=8)
+session.mount('http://', adapter)
 
 
 def write_json(path: str, data: object):
@@ -63,6 +69,12 @@ def convert_to_numbers(d: Dict, keys: List):
             if key not in keys:
                 continue
             d[key] = int(float(value))
+
+
+def tprint(s: str):
+    PID = getpid()
+    TID = threading.currentThread().getName()
+    print(f"[{PID} ({TID})]: {s}")
 
 # ----------------------------- Step 1: Item list -------------------------------
 
@@ -99,11 +111,22 @@ def get_id_from_slug(slug: str) -> int:
 
 def get_item_data(id: int) -> Dict[str, object]:
     name = get_name_for_id(id)
-    print(f'Retrieving item id {id} (' + name + ')')
+    tprint(f'Retrieving item id {id} (' + name + ')')
     uri = BASE_URI + 'crafting/' + slugify(name)
     response = session.get(uri)
     response.raise_for_status()
     return response.text
+
+
+def try_get_item_data(id: int) -> Dict[str, object]:
+    for i in range(0, 6):
+        try:
+            r = get_item_data(id)
+            return r
+        except Exception as e:
+            tprint(f'Exception while performing GET: {str(e)}')
+            tprint(f'Retrying... (attempt {i + 1} of 5)')
+    raise Exception('Data retrieval failed after 5 attempts')
 
 
 def parse_html(id: int, response: str) -> Dict[str, object]:
@@ -113,7 +136,7 @@ def parse_html(id: int, response: str) -> Dict[str, object]:
         "name": item_name,
         "slug": slugify(item_name)
     }
-    tree = BeautifulSoup(response, 'html.parser')
+    tree = BeautifulSoup(response, 'lxml')
     item_type = str(tree.find('div', 'section__heading').find('h4').string)
     result["item_type"] = {"name": item_type}
 
@@ -122,7 +145,8 @@ def parse_html(id: int, response: str) -> Dict[str, object]:
     if slider is None:  # not found
         return None
     frames = slider.find_all('div', class_='crafting__recipe-slide')
-    result["pattern"] = list(chain.from_iterable(map(parse_recipe_frame, frames)))
+    result["pattern"] = list(chain.from_iterable(
+        map(parse_recipe_frame, frames)))
     return result
 
 
@@ -141,7 +165,7 @@ def parse_recipe_frame(frame) -> List[Dict[str, object]]:
         compound_categories = [str(l.find(
             'div', class_='crafting__recipe-item--title').string) for l in missing_links]
         for cat in compound_categories:
-            print(f'WARNING: Skipping recipe containing "' + cat + '"')
+            tprint(f'WARNING: Skipping recipe containing "' + cat + '"')
         return []
 
     recipe_count = 3  # single, bulk and mass
@@ -217,21 +241,83 @@ def find_frame_small_item(root, label):
     return None
 
 
+# --------------------------------- Work queue ---------------------------------
+TOTAL = 0
+RESULTS = []
+
+
+def parse_response(data):
+    (response, id, name) = data
+    tprint(f'Parsing item id {id} ({name})')
+    item = parse_html(id, response)
+    return {
+        "id": id,
+        "name": name,
+        "item": item
+    }
+
+
+def put_item(data):
+    id = data["id"]
+    name = data["name"]
+    item = data["item"]
+    if item is None:
+        tprint(f'WARNING: No data for item id {id} ({name})')
+        return
+    RESULTS.append(item)
+    count = len(RESULTS)
+    tprint(f"COMPLETE: {count}/{TOTAL} - {id} ({name})")
+
+
+def get_page(id: int, name: str):
+    return (try_get_item_data(id), id, name)
+
+
+RESPONSE_BUFFER_SIZE = 8
+WORKER_POOL_SIZE = 8
+
+
 def get_item_definitions() -> List[Dict[str, object]]:
-    items = []
-    count = 0
-    max = len(ID_SLUGS_MAP)
+    global TOTAL
+    tpool = ThreadPoolExecutor(max_workers=RESPONSE_BUFFER_SIZE)
+    ppool = ProcessPoolExecutor(max_workers=WORKER_POOL_SIZE)
+    TOTAL = len(ID_SLUGS_MAP)
+
+    response_jobs = []
+    responses = []
+    jobs = []
+
     for id, name in ID_SLUGS_MAP.items():
-        response = get_item_data(id)
-        print(f'Parsing item id {id} (' + name + ')')
-        item = parse_html(id, response)
-        if item is None:
-            print(f'WARNING: No data for item id {id} (' + name + ')')
+        count = len(RESULTS)
+        r_job = tpool.submit(get_page, id, name)
+        time.sleep(0.01)
+        response_jobs.append(r_job)
+        if (len(response_jobs) < RESPONSE_BUFFER_SIZE) and (TOTAL - count > RESPONSE_BUFFER_SIZE):
             continue
-        items.append(item)
-        count = count + 1
-        print(f'COMPLETE: {count}/{max}')
-    return items
+
+        for f in as_completed(response_jobs):
+            responses.append(f.result())
+
+        for item in responses:
+            job = ppool.submit(parse_response, item)
+            time.sleep(0.01)
+            jobs.append(job)
+        for f in as_completed(jobs):
+            put_item(f.result())
+        jobs.clear()
+        response_jobs.clear()
+        responses.clear()
+    # Finish remaining jobs
+    for f in as_completed(response_jobs):
+        responses.append(f.result())
+
+    for item in responses:
+        job = ppool.submit(parse_response, item)
+        time.sleep(0.01)
+        jobs.append(job)
+    for f in as_completed(jobs):
+        put_item(f.result())
+    return RESULTS
 
 
 # -------------------------------------------------------------------------------

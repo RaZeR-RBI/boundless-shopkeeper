@@ -2,6 +2,7 @@
 **/dist/**
 **/built/**
 icons/**
+updater/**/*.json
 
 # Logs
 logs
