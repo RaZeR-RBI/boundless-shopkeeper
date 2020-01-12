@@ -2,7 +2,7 @@
 	<div class="item-card media" :class="styling">
 		<div class="media-content">
 			<div class="content">
-				<strong>{{ item.name }}</strong>
+				<strong class="is-capitalized">{{ item.name }}</strong>
 				<span class="tag is-success is-pulled-right">{{ item.item_type.name }}</span>
 				<div v-if="isPriceEditable" class="control">
 					<div class="field has-addons">

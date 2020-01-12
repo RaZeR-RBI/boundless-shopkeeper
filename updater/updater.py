@@ -18,24 +18,24 @@ FILE_NAME = 'items.json'
 IMAGE_NAME = 'icons/%s.png'
 IMAGE_SIZE = 64
 ID_SLUGS_MAP = {}
-# TODO: Fill item categories
+
 ITEM_CATEGORIES = {
-    "Any Base Metal": [],
-    "Any Caustic Amalgam": [],
-    "Any Decorative Wood": [],
-    "Any Foliage": [],
-    "Any Frozen Block": [],
-    "Any Metal": [],
-    "Any Potent Amalgam": [],
-    "Any Precious Alloy": [],
-    "Any Refined Rock": [],
-    "Any Refined Wood": [],
-    "Any Rock": [],
-    "Any Stones": [],
-    "Any Timber": [],
-    "Any Trunk": [],
-    "Any Volatile Amalgam": [],
-    "Any Wild Flower": [],
+    "Any Base Metal": ['copper bar', 'iron bar'],
+    "Any Caustic Amalgam": ['corrosion amalgam', 'toxin amalgam'],
+    "Any Decorative Wood": ['decorative ancient wood', 'decorative twisted wood', 'decorative lustrous wood'],
+    "Any Foliage": ['lush foliage', 'exotic foliage', 'waxy foliage'],
+    "Any Frozen Block": ['ice', 'decorative ice', 'glacier'],
+    "Any Metal": ['copper bar', 'iron bar', 'silver bar', 'gold bar', 'titanium bar'],
+    "Any Potent Amalgam": ['shock amalgam', 'chill amalgam'],
+    "Any Precious Alloy": ['silver alloy', 'gold alloy'],
+    "Any Refined Rock": ['refined igneous rock', 'refined sedimentary rock', 'refined metamorphic rock'],
+    "Any Refined Wood": ['refined ancient wood', 'refined twisted wood', 'refined lustrous wood'],
+    "Any Rock": ['metamorphic rock', 'igneous rock', 'sedimentary rock'],
+    "Any Stones": ['metamorphic stones', 'igneous stones', 'sedimentary stones'],
+    "Any Timber": ['twisted wood timber', 'ancient wood timber', 'lustrous wood timber'],
+    "Any Trunk": ['twisted wood trunk', 'ancient wood trunk', 'lustrous wood trunk'],
+    "Any Volatile Amalgam": ['blast amalgam', 'burn amalgam'],
+    "Any Wild Flower": ['gladeflower', 'cloneflower', 'spineflower', 'ghostflower'],
 }
 
 session = requests.Session()
@@ -159,20 +159,34 @@ def parse_recipe_frame(frame) -> List[Dict[str, object]]:
     # parse item list
     items_links = s_recipe.find_all('a', class_='crafting__recipe-item')
 
-    # TODO FIXME: Allow recipes to contain things like 'Any Trunk'
+    # if we don't have a link, then we have an item category (like 'Any Timber')
     if not all([i.has_attr('href') for i in items_links]):
-        missing_links = [i for i in items_links if not i.has_attr('href')]
-        compound_categories = [str(l.find(
-            'div', class_='crafting__recipe-item--title').string) for l in missing_links]
-        for cat in compound_categories:
-            tprint(f'WARNING: Skipping recipe containing "' + cat + '"')
-        return []
+        # clone part of document in order to set href for each item in category
+        frame_clone = BeautifulSoup(str(frame), 'lxml')
+        s_clone = frame_clone.find('div', class_='l-section')
+        items_links = s_clone.find_all('a', class_='crafting__recipe-item')
+        empty_link = [i for i in items_links if not i.has_attr('href')][0]
+        category_name = str(empty_link.find(
+            'div', class_='crafting__recipe-item--title').string)
+        if category_name not in ITEM_CATEGORIES.keys():
+            tprint(f'WARNING: No item category "{category_name}"')
+            return []
+        links = [slugify(n) for n in ITEM_CATEGORIES[category_name]]
+        all_recipes = []
+        for link in links:
+            empty_link["href"] = '/crafting/' + link
+            recipes = parse_recipe_frame(frame_clone)
+            all_recipes.append(recipes)
+        return list(chain.from_iterable(all_recipes))
 
     recipe_count = 3  # single, bulk and mass
     item_counts = {}
     for link in items_links:
         slug = link['href'][len('/crafting/'):]
         item_id = get_id_from_slug(slug)
+        if item_id is None:
+            tprint(f'WARNING: Cannot find item ID for "{slug}"')
+            return []
         qty_tags = link.find_all('div', class_='crafting__recipe-heading')
         item_quantities = [int(n.string) for n in qty_tags]
         item_counts[item_id] = item_quantities
@@ -286,13 +300,14 @@ def get_item_definitions() -> List[Dict[str, object]]:
     response_jobs = []
     responses = []
     jobs = []
+    i = 0
 
     for id, name in ID_SLUGS_MAP.items():
-        count = len(RESULTS)
+        i = i + 1
         r_job = tpool.submit(get_page, id, name)
         time.sleep(0.01)
         response_jobs.append(r_job)
-        if (len(response_jobs) < RESPONSE_BUFFER_SIZE) and (TOTAL - count > RESPONSE_BUFFER_SIZE):
+        if (len(response_jobs) < RESPONSE_BUFFER_SIZE) and (i < TOTAL):
             continue
 
         for f in as_completed(response_jobs):
@@ -307,16 +322,6 @@ def get_item_definitions() -> List[Dict[str, object]]:
         jobs.clear()
         response_jobs.clear()
         responses.clear()
-    # Finish remaining jobs
-    for f in as_completed(response_jobs):
-        responses.append(f.result())
-
-    for item in responses:
-        job = ppool.submit(parse_response, item)
-        time.sleep(0.01)
-        jobs.append(job)
-    for f in as_completed(jobs):
-        put_item(f.result())
     return RESULTS
 
 

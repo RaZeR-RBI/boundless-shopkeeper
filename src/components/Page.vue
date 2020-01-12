@@ -402,7 +402,8 @@ export default class Page extends Vue {
   .dropdown-toggle {
     background: white;
     width: 100%;
-  }
+	}
+	text-transform: capitalize !important;
 }
 
 .item-list {

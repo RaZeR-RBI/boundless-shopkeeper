@@ -20,6 +20,7 @@
 #item-select {
   width: 100vw;
   max-width: 25rem;
+  text-transform: capitalize !important;
 }
 #item-select .dropdown-toggle {
     background: white;
