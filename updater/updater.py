@@ -304,6 +304,8 @@ def get_item_definitions() -> List[Dict[str, object]]:
 
     for id, name in ID_SLUGS_MAP.items():
         i = i + 1
+        if (len(name) <= 0):
+            continue
         r_job = tpool.submit(get_page, id, name)
         time.sleep(0.01)
         response_jobs.append(r_job)
